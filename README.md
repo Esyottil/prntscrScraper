@@ -2,7 +2,7 @@
 Downloads random photos uploaded via Prntscr.
 
 Dependencies for script operation:
-httplib2
+httplib2 , Pillow
 
 Usage:
 python code.py (amount of threads)
