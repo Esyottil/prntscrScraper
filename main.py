@@ -2,9 +2,10 @@ import string
 import random
 import os
 import sys
-import threading 
+import threading
 import httplib2
-import time
+from PIL import Image 
+import io
 
 if not os.path.exists('Image'):
     os.makedirs('Image')
@@ -37,16 +38,20 @@ def scrape_pictures(thread_id):
         h = httplib2.Http('.cache' + str(thread_id))
         response, content = h.request(url)
 
-        if response.status == 200:
+        if response.status == 200: 
             with open(file_path, 'wb') as out:
                 out.write(content)
-
-            file_size = os.path.getsize(file_path)
-            if file_size in INVALID:
-                print("[-] Invalid: " + url)
+            try:
+                img = Image.open(file_path)
+                img.verify()  
+                if img.format != 'JPEG':
+                    print(f"[-] Invalid format (not JPEG): {url}")
+                    os.remove(file_path)
+                else:
+                    print(f"[+] Valid: {url}")
+            except Exception as e:
+                print(f"[-] Invalid image: {url}. Error: {e}")
                 os.remove(file_path)
-            else:
-                print("[+] Valid: " + url)
         else:
             print(f"[-] Failed to download {url}: {response.status}")
 
